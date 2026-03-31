@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "projects": [
+    {
+      "id": "default_web_black",
+      "name": "default_web_black",
+      "version": "1.0.0",
+      "author": "woha",
+      "description": "Начальный черный экран",
+      "types": ["black"],
+      "preview": "https://raw.githubusercontent.com/woha333/jcartools-catalog/main/previews/default_web_black.png",
+      "zip": "https://github.com/someauthor/neon-hud/releases/download/v1.0.0/default_web_black.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
+    }
+  ]
+}
