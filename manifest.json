@@ -29,8 +29,8 @@
       "author": "wohax",
       "description": "Космическая приборка 1",
       "types": ["board"],
-      "preview": "https://raw.githubusercontent.com/JCarTools/mod_space_2/refs/heads/master/mod_space_2.png",
-      "zip": "https://github.com/JCarTools/mod_space_2/raw/refs/heads/master/mod_space_2.zip",
+      "preview": "https://raw.githubusercontent.com/JCarTools/mod_space_1/refs/heads/master/mod_space_1.png",
+      "zip": "https://github.com/JCarTools/mod_space_1/raw/refs/heads/master/mod_space_2.zip",
       "updated_at": "2026-03-31T12:00:00Z",
       "active": true
     }
