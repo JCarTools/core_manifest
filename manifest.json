@@ -44,6 +44,17 @@
       "zip": "https://github.com/JCarTools/mod_space_2/raw/refs/heads/master/mod_space_2.zip",
       "updated_at": "2026-03-31T12:00:00Z",
       "active": true
+    },
+    {
+      "name": "default_hud",
+      "version": "1.0.0",
+      "author": "wohax",
+      "description": "Проекция по умолчанию",
+      "types": ["hud"],
+      "preview": "https://raw.githubusercontent.com/JCarTools/default_hud/refs/heads/master/hud_def.png",
+      "zip": "https://github.com/JCarTools/default_hud/raw/refs/heads/master/default_hud.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
     }
   ]
 }
