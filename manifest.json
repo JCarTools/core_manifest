@@ -22,6 +22,17 @@
       "zip": "https://github.com/JCarTools/default_web_black_mod2/raw/refs/heads/master/default_web_black_mod2.zip",
       "updated_at": "2026-03-31T12:00:00Z",
       "active": true
+    },
+    {
+      "name": "mod_space_2",
+      "version": "1.0.0",
+      "author": "wohax",
+      "description": "Космическая приборка 1",
+      "types": ["board"],
+      "preview": "https://raw.githubusercontent.com/JCarTools/mod_space_2/refs/heads/master/mod_space_2.png",
+      "zip": "https://github.com/JCarTools/mod_space_2/raw/refs/heads/master/mod_space_2.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
     }
   ]
 }
