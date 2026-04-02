@@ -13,6 +13,17 @@
       "active": false
     },
     {
+      "name": "JQ-Home",
+      "version": "1.0.0",
+      "author": "mkkutuz",
+      "description": "JQ Home",
+      "types": ["black"],
+      "preview": "https://raw.githubusercontent.com/JCarTools/JQ-Home/refs/heads/master/hud_def.png",
+      "zip": "https://github.com/JCarTools/JQ-Home/raw/refs/heads/master/JQ-Home.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
+    },
+    {
       "name": "default_web_black_mod2",
       "version": "1.0.0",
       "author": "wohax",
