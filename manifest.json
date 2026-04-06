@@ -35,6 +35,17 @@
       "active": true
     },
     {
+      "name": "web_black4",
+      "version": "1.0.0",
+      "author": "skorpion_44",
+      "description": "Начальный черный экран мод 4",
+      "types": ["black"],
+      "preview": "https://raw.githubusercontent.com/JCarTools/web_black4/refs/heads/master/web_black4.png",
+      "zip": "https://github.com/JCarTools/web_black4/archive/refs/heads/master.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
+    },
+    {
       "name": "mod_space_1",
       "version": "1.0.0",
       "author": "wohax",
@@ -65,7 +76,7 @@
       "preview": "https://raw.githubusercontent.com/JCarTools/default_hud/refs/heads/master/hud_def.png",
       "zip": "https://github.com/JCarTools/default_hud/raw/refs/heads/master/default_hud.zip",
       "updated_at": "2026-03-31T12:00:00Z",
-      "active": true
+      "active": false
     }
   ]
 }
