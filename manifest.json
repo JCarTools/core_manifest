@@ -46,13 +46,13 @@
       "active": true
     },
     {
-      "name": "JQ_Wallpapers",
+      "name": "JQ-Wallpapers",
       "version": "1.0.0",
       "author": "mkkutuz",
       "description": "JQ Wallpapers",
       "types": ["black"],
-      "preview": "https://raw.githubusercontent.com/JCarTools/JQ Wallpapers/refs/heads/master/JQ Wallpapers.png",
-      "zip": "https://github.com/JCarTools/JQ Wallpapers/archive/refs/heads/master.zip",
+      "preview": "https://raw.githubusercontent.com/JCarTools/JQ-Wallpapers/refs/heads/master/JQ Wallpapers.png",
+      "zip": "https://github.com/JCarTools/JQ-Wallpapers/archive/refs/heads/master.zip",
       "updated_at": "2026-03-31T12:00:00Z",
       "active": true
     },
