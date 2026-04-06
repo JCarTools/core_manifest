@@ -18,10 +18,10 @@
       "author": "mkkutuz",
       "description": "JQ Home",
       "types": ["black"],
-      "preview": "https://raw.githubusercontent.com/JCarTools/JQ-Home/refs/heads/master/hud_def.png",
-      "zip": "https://github.com/JCarTools/JQ-Home/raw/refs/heads/master/JQ-Home.zip",
+      "preview": "https://raw.githubusercontent.com/JCarTools/JQ-Home/refs/heads/master/JQ-Home.png",
+      "zip": "https://github.com/JCarTools/JQ-Home/archive/refs/heads/master.zip",
       "updated_at": "2026-03-31T12:00:00Z",
-      "active": false
+      "active": true
     },
     {
       "name": "JQ-lite",
@@ -32,7 +32,7 @@
       "preview": "https://raw.githubusercontent.com/JCarTools/JQ-lite/refs/heads/master/JQ-lite.png",
       "zip": "https://github.com/JCarTools/JQ-lite/archive/refs/heads/master.zip",
       "updated_at": "2026-03-31T12:00:00Z",
-      "active": true
+      "active": false
     },
     {
       "name": "default_web_black_mod2",
