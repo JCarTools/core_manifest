@@ -68,6 +68,17 @@
       "active": true
     },
     {
+      "name": "web_black4full",
+      "version": "2.0.0",
+      "author": "skorpion_44",
+      "description": "Начальный черный экран мод 4 расширенный",
+      "types": ["black"],
+      "preview": "https://raw.githubusercontent.com/JCarTools/web_black4full/refs/heads/master/web_black4full.png",
+      "zip": "https://github.com/JCarTools/web_black4full/archive/refs/heads/master.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
+    },
+    {
       "name": "JQ-Wallpapers",
       "version": "1.0.0",
       "author": "mkkutuz",
