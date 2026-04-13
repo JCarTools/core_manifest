@@ -134,6 +134,17 @@
       "active": true
     },
     {
+      "name": "default_hud_txl",
+      "version": "1.0.0",
+      "author": "wohax",
+      "description": "Подсказки на приборную панель TXL",
+      "types": ["hud"],
+      "preview": "https://raw.githubusercontent.com/JCarTools/default_hud_txl/refs/heads/master/hud_def.png",
+      "zip": "https://github.com/JCarTools/default_hud_txl/raw/refs/heads/master/default_hud_txl.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
+    },
+    {
       "name": "default_hud",
       "version": "1.0.0",
       "author": "wohax",
