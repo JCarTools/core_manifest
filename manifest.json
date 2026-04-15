@@ -165,6 +165,17 @@
       "zip": "https://github.com/JCarTools/hud_mod1/archive/refs/heads/master.zip",
       "updated_at": "2026-03-31T12:00:00Z",
       "active": true
+    },
+    {
+      "name": "hud_mod_righti",
+      "version": "1.0.0",
+      "author": "wohax",
+      "description": "Проекция по умолчанию Антирадар справа",
+      "types": ["hud"],
+      "preview": "https://raw.githubusercontent.com/JCarTools/hud_mod_righti/refs/heads/master/hud_mod_righti.png",
+      "zip": "https://github.com/JCarTools/hud_mod_righti/archive/refs/heads/master.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
     }
   ]
 }
