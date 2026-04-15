@@ -176,6 +176,17 @@
       "zip": "https://github.com/JCarTools/hud_mod_righti/archive/refs/heads/master.zip",
       "updated_at": "2026-03-31T12:00:00Z",
       "active": true
+    },
+    {
+      "name": "alt_compact_glass",
+      "version": "1.0.0",
+      "author": "wohax",
+      "description": "Проекция компактное стекло",
+      "types": ["hud"],
+      "preview": "https://raw.githubusercontent.com/JCarTools/alt_compact_glass/refs/heads/master/alt_compact_glass.png",
+      "zip": "https://github.com/JCarTools/alt_compact_glass/archive/refs/heads/master.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
     }
   ]
 }
