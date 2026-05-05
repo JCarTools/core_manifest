@@ -3,7 +3,7 @@
 Документация API для HTML-экранов JCarTools.
 
 - HTML-версия документации: [`index.html`](./index.html)
-- Разделы: [чёрный экран](#чёрный-экран), [приборная панель](#приборная-панель)
+- Разделы: [чёрный экран](#чёрный-экран), [приборная панель / HUD](#приборная-панель--hud)
 
 ## Чёрный экран
 
@@ -258,12 +258,9 @@ window.onAndroidEvent = function(type, data) {
 | `musicInfo` | `PlayStat`, `SongName`, `SongArtist`, `SongAlbum`, `SongAlbumPicture`, `Trpos`, `Trdur` | Данные текущего трека. |
 | `gps` | `lat`, `lon`, `speed`, `heading` | Координаты, GPS-скорость и курс. |
 | `speed` | `value` | Скорость автомобиля. |
-| `rpm` | `value` | Обороты двигателя. |
-| `hud` | `hudSenderType`, `aradarOn`, `naviOn`, `turnType`, `turnDist`, `remainDist`, `nextRoad`, `speedLimit` | Навигационные и антирадарные данные. |
 | `weather` | `temp`, `icon` | Погода. |
 | `theme` | `mode` | Тема: `dark` или `light`. |
 | `LogData` | `value` | Строка из автомобильного лога, найденная по фильтрам `setLogFilter(...)`. |
-| `GPSSignalQuality` | `updateSignalQuality` | Качество GPS-сигнала. |
 | `ping` | `ok` | Ответ на `pingEvent(token)`. |
 
 ### Получение данных из логов авто
@@ -346,6 +343,101 @@ window.onAndroidEvent = function(type, data) {
 };
 ```
 
-## Приборная панель
+## Приборная панель / HUD
 
-Раздел для API экранов приборной панели. Здесь будут описаны события скорости, RPM, HUD и специфичные методы приборной панели.
+HUD-экран принимает навигационные, антирадарные и GPS-события от Android. Для запуска обмена данными экран вызывает:
+
+```js
+window.androidApi.onJsReady(TOKEN);
+```
+
+### События HUD
+
+| Событие | Поля `data` | Назначение |
+| --- | --- | --- |
+| `hud` | `hudSenderType`, `aradarOn`, `naviOn`, `turnType`, `turnDist`, `remainDist`, `nextRoad`, `speedLimit` | Навигация и антирадар. `hudSenderType` определяет тип панели: `NAVI` или `ARAD`. |
+| `GPSSignalQuality` | `updateSignalQuality` | Качество GPS-сигнала для индикатора на HUD. |
+
+### Пример события NAVI
+
+```json
+{
+  "hudSenderType": "NAVI",
+  "aradarOn": false,
+  "naviOn": true,
+  "turnType": 3,
+  "turnDist": 420,
+  "remainDist": 8500,
+  "nextRoad": "Ленина",
+  "speedLimit": 60
+}
+```
+
+### Пример события ARAD
+
+```json
+{
+  "hudSenderType": "ARAD",
+  "aradarOn": true,
+  "naviOn": false,
+  "turnType": 14,
+  "turnDist": 70,
+  "remainDist": 70,
+  "nextRoad": "",
+  "speedLimit": 90
+}
+```
+
+### Пример качества GPS
+
+```json
+{
+  "updateSignalQuality": 65
+}
+```
+
+### Приём событий HUD
+
+```js
+window.onAndroidEvent = function(type, data) {
+  if (type === "GPSSignalQuality") {
+    updateGpsLevel(data.updateSignalQuality);
+    return;
+  }
+
+  if (type === "hud") {
+    updateHud(data);
+  }
+};
+```
+
+### Коды манёвров HUD
+
+| Код | Манёвр |
+| --- | --- |
+| `2` | Поворот налево |
+| `3` | Поворот направо |
+| `4` | Съезд / развилка налево |
+| `5` | Съезд / развилка направо |
+| `6` | Резкий поворот налево |
+| `7` | Резкий поворот направо |
+| `8` | Разворот налево |
+| `19` | Разворот направо |
+| `9` | Движение прямо |
+| `24` | Въезд на круговое движение |
+| `55` | Выезд с кругового движения |
+| `15` | Финиш маршрута |
+| `49` | Паром / переправа |
+| `14` | Камера / контроль |
+
+### Уровни GPS
+
+| Значение `updateSignalQuality` | Состояние |
+| --- | --- |
+| `null` / `undefined` | Индикатор скрыт |
+| `< 14` | Низкий сигнал |
+| `14..29` | Уровень 1 |
+| `30..49` | Уровень 2 |
+| `50..69` | Уровень 3 |
+| `70..79` | Уровень 4 |
+| `>= 80` | Уровень 5 |

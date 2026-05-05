@@ -411,7 +411,7 @@
       <div class="nav-title">Разделы</div>
       <nav class="nav">
         <a class="active" href="#black-screen">Чёрный экран</a>
-        <a href="#dashboard">Приборная панель</a>
+        <a href="#dashboard-hud">Приборная панель</a>
       </nav>
 
       <div class="nav-title">Чёрный экран</div>
@@ -422,6 +422,11 @@
         <a href="#android-to-js">Android → JS</a>
         <a href="#commands">Команды</a>
         <a href="#examples">Примеры</a>
+      </nav>
+
+      <div class="nav-title">Приборная панель</div>
+      <nav class="nav">
+        <a href="#dashboard-hud">HUD</a>
       </nav>
     </aside>
 
@@ -441,7 +446,7 @@
 
       <div class="section-tabs">
         <a class="tab active" href="#black-screen">Чёрный экран</a>
-        <a class="tab" href="#dashboard">Приборная панель</a>
+        <a class="tab" href="#dashboard-hud">Приборная панель / HUD</a>
       </div>
 
       <section id="basics">
@@ -689,16 +694,6 @@
                 <td>Скорость автомобиля.</td>
               </tr>
               <tr>
-                <td><code>rpm</code></td>
-                <td><code>value</code></td>
-                <td>Обороты двигателя.</td>
-              </tr>
-              <tr>
-                <td><code>hud</code></td>
-                <td><code>hudSenderType</code>, <code>aradarOn</code>, <code>naviOn</code>, <code>turnType</code>, <code>turnDist</code>, <code>remainDist</code>, <code>nextRoad</code>, <code>speedLimit</code></td>
-                <td>Навигационные и антирадарные данные для HUD/виджетов.</td>
-              </tr>
-              <tr>
                 <td><code>weather</code></td>
                 <td><code>temp</code>, <code>icon</code></td>
                 <td>Температура и ID иконки погоды.</td>
@@ -712,11 +707,6 @@
                 <td><code>LogData</code></td>
                 <td><code>value</code></td>
                 <td>Строка из автомобильного лога, найденная по фильтрам `setLogFilter(token, q1, q2, q3)`.</td>
-              </tr>
-              <tr>
-                <td><code>GPSSignalQuality</code></td>
-                <td><code>updateSignalQuality</code></td>
-                <td>Качество GPS-сигнала.</td>
               </tr>
               <tr>
                 <td><code>ping</code></td>
@@ -855,21 +845,160 @@ window.onAndroidEvent = function(type, data) {
         </div>
       </section>
 
-      <section id="dashboard">
+      <section id="dashboard-hud">
         <div class="section-head">
-          <h2>Приборная панель</h2>
-          <p>Раздел для API экранов приборной панели. Здесь будут описаны события скорости, RPM, HUD и специфичные методы приборной панели.</p>
+          <h2>Приборная панель / HUD</h2>
+          <p>HUD-экран принимает навигационные, антирадарные и GPS-события от Android. Для запуска обмена данными экран вызывает `onJsReady(token)`.</p>
         </div>
 
-        <div class="placeholder">
-          <div>
-            <h3>API приборной панели</h3>
-            <p>Документация будет добавлена отдельным разделом.</p>
-          </div>
+        <div class="grid">
+          <article class="card method">
+            <h3>Инициализация</h3>
+            <div class="signature">window.androidApi.onJsReady(TOKEN)</div>
+            <p>После вызова Android начинает отправлять события HUD в `window.onAndroidEvent(type, data)`.</p>
+          </article>
+
+          <article class="card method">
+            <h3>События HUD</h3>
+            <div class="signature">window.onAndroidEvent(type, data)</div>
+            <p>HUD-экран обрабатывает события `hud` и `GPSSignalQuality`.</p>
+          </article>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Событие</th>
+                <th>JSON data</th>
+                <th>Назначение</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>hud</code></td>
+                <td><code>hudSenderType</code>, <code>aradarOn</code>, <code>naviOn</code>, <code>turnType</code>, <code>turnDist</code>, <code>remainDist</code>, <code>nextRoad</code>, <code>speedLimit</code></td>
+                <td>Навигация и антирадар. `hudSenderType` определяет тип панели: `NAVI` или `ARAD`.</td>
+              </tr>
+              <tr>
+                <td><code>GPSSignalQuality</code></td>
+                <td><code>updateSignalQuality</code></td>
+                <td>Качество GPS-сигнала для индикатора на HUD.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid">
+          <article class="card">
+            <h3>Пример события NAVI</h3>
+            <pre><code>{
+  "hudSenderType": "NAVI",
+  "aradarOn": false,
+  "naviOn": true,
+  "turnType": 3,
+  "turnDist": 420,
+  "remainDist": 8500,
+  "nextRoad": "Ленина",
+  "speedLimit": 60
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>Пример события ARAD</h3>
+            <pre><code>{
+  "hudSenderType": "ARAD",
+  "aradarOn": true,
+  "naviOn": false,
+  "turnType": 14,
+  "turnDist": 70,
+  "remainDist": 70,
+  "nextRoad": "",
+  "speedLimit": 90
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>Пример качества GPS</h3>
+            <pre><code>{
+  "updateSignalQuality": 65
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>Приём событий</h3>
+            <pre><code>window.onAndroidEvent = function(type, data) {
+  if (type === "GPSSignalQuality") {
+    updateGpsLevel(data.updateSignalQuality);
+    return;
+  }
+
+  if (type === "hud") {
+    updateHud(data);
+  }
+};</code></pre>
+          </article>
+        </div>
+
+        <div class="section-head">
+          <h2>Коды манёвров HUD</h2>
+          <p>Поле `turnType` выбирает иконку манёвра.</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Код</th>
+                <th>Манёвр</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>2</code></td><td>Поворот налево</td></tr>
+              <tr><td><code>3</code></td><td>Поворот направо</td></tr>
+              <tr><td><code>4</code></td><td>Съезд / развилка налево</td></tr>
+              <tr><td><code>5</code></td><td>Съезд / развилка направо</td></tr>
+              <tr><td><code>6</code></td><td>Резкий поворот налево</td></tr>
+              <tr><td><code>7</code></td><td>Резкий поворот направо</td></tr>
+              <tr><td><code>8</code></td><td>Разворот налево</td></tr>
+              <tr><td><code>19</code></td><td>Разворот направо</td></tr>
+              <tr><td><code>9</code></td><td>Движение прямо</td></tr>
+              <tr><td><code>24</code></td><td>Въезд на круговое движение</td></tr>
+              <tr><td><code>55</code></td><td>Выезд с кругового движения</td></tr>
+              <tr><td><code>15</code></td><td>Финиш маршрута</td></tr>
+              <tr><td><code>49</code></td><td>Паром / переправа</td></tr>
+              <tr><td><code>14</code></td><td>Камера / контроль</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section-head">
+          <h2>Уровни GPS</h2>
+          <p>`updateSignalQuality` переводится в визуальные уровни индикатора.</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Значение</th>
+                <th>Состояние</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>null</code> / <code>undefined</code></td><td>Индикатор скрыт</td></tr>
+              <tr><td><code>&lt; 14</code></td><td>Низкий сигнал</td></tr>
+              <tr><td><code>14..29</code></td><td>Уровень 1</td></tr>
+              <tr><td><code>30..49</code></td><td>Уровень 2</td></tr>
+              <tr><td><code>50..69</code></td><td>Уровень 3</td></tr>
+              <tr><td><code>70..79</code></td><td>Уровень 4</td></tr>
+              <tr><td><code>&gt;= 80</code></td><td>Уровень 5</td></tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
-      <div class="footer">Документация API чёрного экрана JCarTools.</div>
+      <div class="footer">Документация API экранов JCarTools.</div>
     </main>
   </div>
 </body>
