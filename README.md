@@ -41,6 +41,8 @@ window.androidApi.onJsReady(TOKEN);
 | `setvol(token, value)` | `void` | Установить громкость. |
 | `getvol(token)` | number | Получить текущую media-громкость в процентах. |
 | `getCarData(token, name)` | JSON string | Получить данные автомобиля по имени запроса. |
+| `carCommand(token, json)` | JSON string | Выполнить JSON-команду текущего `CarCmdProxy.c(...)`. |
+| `carCmd(token, json)` | JSON string | Короткий alias для `carCommand(...)`. |
 | `getFileList(token)` | JSON string | Получить список файлов из Downloads. |
 | `getFile(token, name)` | string | Получить файл из Downloads в base64. |
 | `setLogFilter(token, q1, q2, q3)` | `void` | Задать до трёх фильтров для чтения строк из автомобильных логов. |
@@ -76,16 +78,19 @@ const volume = window.androidApi.getvol(TOKEN);
 
 Возвращает JSON-строку с данными автомобиля. Метод только читает данные из `CarCmdProxy`; управляющие команды через него не выполняются.
 
+Часть данных может приходить через универсальные JSON-команды `CarCmdProxy.c(...)`. Например, для топлива используется команда `get_fuel_percent`, если текущий автомобильный proxy её поддерживает.
+
 Доступные имена запроса:
 
 | `name` | Ответ |
 | --- | --- |
 | `all`, `state`, `car`, `carState`, `car_state` | общий снимок: `vehicle`, `heat`, `seats` |
-| `vehicle`, `vehicleState`, `vehicle_state` | скорость, обороты, двигатель, температура, АКБ, водитель, люк, паркинг |
+| `vehicle`, `vehicleState`, `vehicle_state` | скорость, обороты, двигатель, температура, АКБ, топливо, водитель, люк, паркинг |
 | `heat`, `heats`, `heating`, `climate` | состояния обогревов руля, лобового и заднего стекла, температура водителя и пассажира |
 | `seats` | передние и задние сиденья |
 | `frontSeats`, `front_seats` | передние сиденья |
 | `rearSeats`, `rear_seats`, `zadSeats`, `zad_seats` | задние сиденья |
+| `fuel`, `fuelPercent`, `fuel_percent`, `getFuelPercent` | уровень топлива в процентах |
 | `speed`, `getSpeed` | скорость |
 | `rpm`, `getRPM` | обороты двигателя |
 | `engine`, `engineState`, `getstatengin` | состояние двигателя |
@@ -119,6 +124,8 @@ const car = JSON.parse(
     "engine": true,
     "outTemp": 18,
     "batteryVoltage": 12.4,
+    "fuelPercent": 75.3,
+    "fuelPercentRaw": 753,
     "vod": 1,
     "sun": false,
     "park": false
@@ -185,6 +192,16 @@ const seats = JSON.parse(
 }
 ```
 
+Где:
+
+| Поле | Значение |
+| --- | --- |
+| `seat: 0` | левое заднее сиденье |
+| `seat: 1` | левое / водительское переднее сиденье или правое заднее сиденье, зависит от блока ответа |
+| `seat: 2` | правое / пассажирское переднее сиденье |
+| `heat` | текущий уровень подогрева |
+| `vent` | текущий уровень вентиляции |
+
 Температуру водителя и пассажира можно получить одним запросом:
 
 ```js
@@ -216,15 +233,77 @@ const speed = JSON.parse(
 }
 ```
 
-Где:
+Уровень топлива можно получить отдельным запросом:
 
-| Поле | Значение |
+```js
+const fuel = JSON.parse(
+  window.androidApi.getCarData(TOKEN, "fuel")
+);
+```
+
+```json
+{
+  "command": "get_fuel_percent",
+  "success": true,
+  "raw": 753,
+  "value": 75.3,
+  "percent": 75.3,
+  "unit": "%",
+  "rawValues": [753],
+  "name": "fuelPercent"
+}
+```
+
+`raw` хранит исходное 16-bit значение `0..1000`, где `1000` означает `100.0%`. Поля `value` и `percent` уже переведены в проценты.
+
+### `carCommand(token, json)` / `carCmd(token, json)`
+
+Передаёт JSON-команду напрямую в текущий автомобильный proxy через `CarCmdProxy.c(JSONObject)` и возвращает JSON-ответ строкой. Метод нужен для расширяемых команд, которые не входят в стандартные getter’ы `CarCmdProxy`.
+
+```js
+const fuel = JSON.parse(
+  window.androidApi.carCommand(TOKEN, JSON.stringify({
+    cmd: "get_fuel_percent"
+  }))
+);
+```
+
+Пример ответа:
+
+```json
+{
+  "command": "get_fuel_percent",
+  "success": true,
+  "raw": 753,
+  "value": 75.3,
+  "percent": 75.3,
+  "unit": "%",
+  "rawValues": [753]
+}
+```
+
+Для Jaecoo PHEV также доступны команды режимов:
+
+```js
+window.androidApi.carCommand(TOKEN, JSON.stringify({
+  cmd: "set_energy_recycle",
+  value: 3
+}));
+
+window.androidApi.carCommand(TOKEN, JSON.stringify({
+  cmd: "set_battery_protection",
+  value: 2
+}));
+```
+
+Значения:
+
+| Команда | Значения |
 | --- | --- |
-| `seat: 0` | левое заднее сиденье |
-| `seat: 1` | левое / водительское переднее сиденье или правое заднее сиденье, зависит от блока ответа |
-| `seat: 2` | правое / пассажирское переднее сиденье |
-| `heat` | текущий уровень подогрева |
-| `vent` | текущий уровень вентиляции |
+| `set_energy_recycle` | `1` low, `2` medium, `3` high |
+| `set_battery_protection` | `1` Initial, `2` Smart, `4` Forced |
+| `get_energy_recycle` | возвращает текущий уровень рекуперации |
+| `get_battery_protection` | возвращает текущий режим защиты батареи |
 
 Если конкретный автомобильный proxy не переопределяет getter из `CarCmdProxy`, вернётся default-значение интерфейса: обычно `false`, `0` или `0f`; для наружной температуры используется `-99`, для температуры салона - `-99f`.
 
