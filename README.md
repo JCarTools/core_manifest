@@ -82,7 +82,7 @@ const volume = window.androidApi.getvol(TOKEN);
 | --- | --- |
 | `all`, `state`, `car`, `carState`, `car_state` | общий снимок: `vehicle`, `heat`, `seats` |
 | `vehicle`, `vehicleState`, `vehicle_state` | скорость, обороты, двигатель, температура, АКБ, водитель, люк, паркинг |
-| `heat`, `heats`, `heating`, `climate` | состояния обогревов руля, лобового и заднего стекла |
+| `heat`, `heats`, `heating`, `climate` | состояния обогревов руля, лобового и заднего стекла, температура водителя и пассажира |
 | `seats` | передние и задние сиденья |
 | `frontSeats`, `front_seats` | передние сиденья |
 | `rearSeats`, `rear_seats`, `zadSeats`, `zad_seats` | задние сиденья |
@@ -90,6 +90,9 @@ const volume = window.androidApi.getvol(TOKEN);
 | `rpm`, `getRPM` | обороты двигателя |
 | `engine`, `engineState`, `getstatengin` | состояние двигателя |
 | `outTemp`, `out_temp`, `getouttemp` | наружная температура |
+| `driverTemp`, `driver_temp` | температура водителя |
+| `passengerTemp`, `passenger_temp` | температура пассажира |
+| `cabinTemp`, `cabin_temp` | температура водителя и пассажира |
 | `vod`, `getvod` | выбранный водитель / профиль |
 | `sun`, `getsun` | состояние люка |
 | `park`, `parkOnOff`, `getParkOnOff` | состояние парковочного режима |
@@ -124,7 +127,9 @@ const car = JSON.parse(
     "name": "heat",
     "rulHeat": true,
     "lobHeat": false,
-    "zadHeat": false
+    "zadHeat": false,
+    "driverTemp": 22.0,
+    "passengerTemp": 22.5
   },
   "seats": {
     "name": "seats",
@@ -180,6 +185,22 @@ const seats = JSON.parse(
 }
 ```
 
+Температуру водителя и пассажира можно получить одним запросом:
+
+```js
+const cabinTemp = JSON.parse(
+  window.androidApi.getCarData(TOKEN, "cabinTemp")
+);
+```
+
+```json
+{
+  "name": "cabinTemp",
+  "driverTemp": 22.0,
+  "passengerTemp": 22.5
+}
+```
+
 Для одиночных значений возвращается объект с полями `name` и `value`:
 
 ```js
@@ -205,7 +226,7 @@ const speed = JSON.parse(
 | `heat` | текущий уровень подогрева |
 | `vent` | текущий уровень вентиляции |
 
-Если конкретный автомобильный proxy не переопределяет getter из `CarCmdProxy`, вернётся default-значение интерфейса: обычно `false`, `0` или `0f`; для наружной температуры используется `-99`.
+Если конкретный автомобильный proxy не переопределяет getter из `CarCmdProxy`, вернётся default-значение интерфейса: обычно `false`, `0` или `0f`; для наружной температуры используется `-99`, для температуры салона - `-99f`.
 
 ### `getUserApps(token)`
 
@@ -411,9 +432,10 @@ window.androidApi.runEnum(TOKEN, "MEDIA_PLAY");
 | --- | --- | --- |
 | Навигация интерфейса | `GO_TO_PP`, `GO_TO_GU`, `TOGGLE_GU_PP`, `TOGGLE_GU_PP_CPP`, `GO_CPP_TO_PP`, `TOGGLE_CPP_PP` | Переключение между головным устройством, приборкой, картами и штатными экранами. |
 | Системные действия | `RUN_BLACK`, `OPEN_SHTORKA`, `CLOSE_SHTORKA`, `GLOBAL_BACK`, `GLOBAL_HOME`, `RUN_START_APP_MENU`, `RUN_FUN_CAR`, `SPLIT_RUN` | Чёрный экран, шторка, глобальные кнопки, меню приложений, быстрый доступ к функциям авто и разделение экрана. |
-| Медиа | `MEDIA_PLAY`, `MEDIA_PAUSE`, `MEDIA_NEXT`, `MEDIA_BLACK` | Плей, пауза, следующий и предыдущий трек. |
+| Медиа | `MEDIA_PLAY`, `MEDIA_PAUSE`, `MEDIA_NEXT`, `MEDIA_BLACK`, `Volume_Down`, `Volume_Up` | Плей, пауза, следующий и предыдущий трек, уменьшение и увеличение громкости на 1 процент от текущей. |
 | Передние сиденья | `heat_seat_l_0..3`, `heat_seat_r_0..3`, `vent_seat_l_0..3`, `vent_seat_r_0..3` | Подогрев и вентиляция водительского и пассажирского передних сидений. |
 | Обогревы | `heat_wheel_on`, `heat_wheel_off`, `heat_windshield_on`, `heat_windshield_off`, `heat_rearwindow_on`, `heat_rearwindow_off` | Руль, лобовое стекло и заднее стекло. |
+| Климат | `Driver_Temp_Down`, `Driver_Temp_Up`, `Passenger_Temp_Down`, `Passenger_Temp_Up` | Уменьшение и увеличение температуры водителя или пассажира на 1 от текущей. |
 | Задние сиденья | `heat_zad_seat_l_0..3`, `heat_zad_seat_r_off`, `heat_zad_seat_r_1..3` | Подогрев заднего левого и заднего правого сиденья. |
 | Профили и прочее | `VIBOR_VODITEL`, `voditel_seat_1`, `voditel_seat_2`, `voditel_seat_3`, `VIEW_ALL_MESSAGE`, `b_fiksik_on`, `b_fiksik_off`, `RUN_APP_MORE`, `RUN_SPICH_FOCUS`, `Recirculation_On`, `Recirculation_Off` | Выбор водителя, сообщения, голосовой помощник, группа задач и рециркуляция. |
 
