@@ -35,6 +35,17 @@
       "active": true
     },
     {
+      "name": "DriveJ7-Web",
+      "version": "1.1.0",
+      "author": "Hudson8811",
+      "description": "DriveJ7-Web",
+      "types": ["black"],
+      "preview": "https://raw.githubusercontent.com/JCarTools/DriveJ7-Web/refs/heads/master/DriveJ7-Web.png",
+      "zip": "https://github.com/JCarTools/DriveJ7-Web/archive/refs/heads/master.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
+    },
+    {
       "name": "JQ-lite",
       "version": "1.0.0",
       "author": "mkkutuz",
