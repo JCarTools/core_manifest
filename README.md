@@ -50,9 +50,17 @@ window.androidApi.onJsReady(TOKEN);
 
 ## Получение данных
 
+### `setvol(token, value)`
+
+Устанавливает media-громкость в процентах. `value` считается процентом `0..100`; значения ниже `0` прижимаются к `0`, выше `100` - к `100`.
+
+```js
+window.androidApi.setvol(TOKEN, 65);
+```
+
 ### `getvol(token)`
 
-Возвращает число `0..100`. При ошибке возвращает `-1`.
+Возвращает текущую media-громкость числом `0..100`. При ошибке возвращает `-1`.
 
 ```js
 const volume = window.androidApi.getvol(TOKEN);
@@ -64,22 +72,97 @@ const volume = window.androidApi.getvol(TOKEN);
 85
 ```
 
-### `getCarData(token, "frontSeats")`
+### `getCarData(token, name)`
 
-Возвращает JSON-строку с состоянием передних сидений.
+Возвращает JSON-строку с данными автомобиля. Метод только читает данные из `CarCmdProxy`; управляющие команды через него не выполняются.
 
 Доступные имена запроса:
 
-- `frontSeats`
-- `front_seats`
+| `name` | Ответ |
+| --- | --- |
+| `all`, `state`, `car`, `carState`, `car_state` | общий снимок: `vehicle`, `heat`, `seats` |
+| `vehicle`, `vehicleState`, `vehicle_state` | скорость, обороты, двигатель, температура, АКБ, водитель, люк, паркинг |
+| `heat`, `heats`, `heating`, `climate` | состояния обогревов руля, лобового и заднего стекла |
+| `seats` | передние и задние сиденья |
+| `frontSeats`, `front_seats` | передние сиденья |
+| `rearSeats`, `rear_seats`, `zadSeats`, `zad_seats` | задние сиденья |
+| `speed`, `getSpeed` | скорость |
+| `rpm`, `getRPM` | обороты двигателя |
+| `engine`, `engineState`, `getstatengin` | состояние двигателя |
+| `outTemp`, `out_temp`, `getouttemp` | наружная температура |
+| `vod`, `getvod` | выбранный водитель / профиль |
+| `sun`, `getsun` | состояние люка |
+| `park`, `parkOnOff`, `getParkOnOff` | состояние парковочного режима |
+| `battery`, `batteryVoltage`, `akbvolt` | напряжение АКБ |
+| `rulHeat`, `steeringHeat`, `getrulheat` | обогрев руля |
+| `lobHeat`, `windshieldHeat`, `getlobheat` | обогрев лобового стекла |
+| `zadHeat`, `rearHeat`, `getzadheat` | обогрев заднего стекла |
+
+```js
+const car = JSON.parse(
+  window.androidApi.getCarData(TOKEN, "all")
+);
+```
+
+Пример ответа для `all`:
+
+```json
+{
+  "name": "all",
+  "vehicle": {
+    "name": "vehicle",
+    "speed": 42,
+    "rpm": 1200,
+    "engine": true,
+    "outTemp": 18,
+    "batteryVoltage": 12.4,
+    "vod": 1,
+    "sun": false,
+    "park": false
+  },
+  "heat": {
+    "name": "heat",
+    "rulHeat": true,
+    "lobHeat": false,
+    "zadHeat": false
+  },
+  "seats": {
+    "name": "seats",
+    "front": {
+      "name": "frontSeats",
+      "frontLeft": {
+        "seat": 1,
+        "heat": 2,
+        "vent": 0
+      },
+      "frontRight": {
+        "seat": 2,
+        "heat": 0,
+        "vent": 1
+      }
+    },
+    "rear": {
+      "name": "rearSeats",
+      "rearLeft": {
+        "seat": 0,
+        "heat": 1
+      },
+      "rearRight": {
+        "seat": 1,
+        "heat": 0
+      }
+    }
+  }
+}
+```
+
+Старый формат `frontSeats` сохранён:
 
 ```js
 const seats = JSON.parse(
   window.androidApi.getCarData(TOKEN, "frontSeats")
 );
 ```
-
-Пример ответа:
 
 ```json
 {
@@ -97,14 +180,32 @@ const seats = JSON.parse(
 }
 ```
 
+Для одиночных значений возвращается объект с полями `name` и `value`:
+
+```js
+const speed = JSON.parse(
+  window.androidApi.getCarData(TOKEN, "speed")
+);
+```
+
+```json
+{
+  "name": "speed",
+  "value": 42
+}
+```
+
 Где:
 
 | Поле | Значение |
 | --- | --- |
-| `seat: 1` | левое / водительское переднее сиденье |
+| `seat: 0` | левое заднее сиденье |
+| `seat: 1` | левое / водительское переднее сиденье или правое заднее сиденье, зависит от блока ответа |
 | `seat: 2` | правое / пассажирское переднее сиденье |
 | `heat` | текущий уровень подогрева |
 | `vent` | текущий уровень вентиляции |
+
+Если конкретный автомобильный proxy не переопределяет getter из `CarCmdProxy`, вернётся default-значение интерфейса: обычно `false`, `0` или `0f`; для наружной температуры используется `-99`.
 
 ### `getUserApps(token)`
 
