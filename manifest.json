@@ -57,6 +57,17 @@
       "active": true
     },
     {
+      "name": "JQLite_mod_by_svoi_v_dosku",
+      "version": "1.0.0",
+      "author": "npetrovskiy",
+      "description": "JQLite_mod_by_svoi_v_dosku",
+      "types": ["black"],
+      "preview": "https://raw.githubusercontent.com/JCarTools/JQLite_mod_by_svoi_v_dosku/refs/heads/master/img/screenshot.png",
+      "zip": "https://github.com/JCarTools/JQLite_mod_by_svoi_v_dosku/archive/refs/heads/master.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
+    },
+    {
       "name": "JQ-lite-mod1",
       "version": "1.0.0",
       "author": "mkkutuz",
