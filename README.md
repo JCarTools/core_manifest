@@ -157,11 +157,13 @@ const car = JSON.parse(
       "name": "rearSeats",
       "rearLeft": {
         "seat": 0,
-        "heat": 1
+        "heat": 1,
+        "vent": 2
       },
       "rearRight": {
         "seat": 1,
-        "heat": 0
+        "heat": 0,
+        "vent": 1
       }
     }
   }
@@ -192,6 +194,30 @@ const seats = JSON.parse(
 }
 ```
 
+Задние сиденья можно запросить отдельно:
+
+```js
+const rearSeats = JSON.parse(
+  window.androidApi.getCarData(TOKEN, "rearSeats")
+);
+```
+
+```json
+{
+  "name": "rearSeats",
+  "rearLeft": {
+    "seat": 0,
+    "heat": 1,
+    "vent": 2
+  },
+  "rearRight": {
+    "seat": 1,
+    "heat": 0,
+    "vent": 1
+  }
+}
+```
+
 Где:
 
 | Поле | Значение |
@@ -201,6 +227,8 @@ const seats = JSON.parse(
 | `seat: 2` | правое / пассажирское переднее сиденье |
 | `heat` | текущий уровень подогрева |
 | `vent` | текущий уровень вентиляции |
+
+Для сидений уровни обычно возвращаются числом `0..4` или `1..4`, в зависимости от конкретного автомобильного proxy. Если proxy не поддерживает getter, приходит default-значение `0`.
 
 Температуру водителя и пассажира можно получить одним запросом:
 
@@ -515,7 +543,7 @@ window.androidApi.runEnum(TOKEN, "MEDIA_PLAY");
 | Передние сиденья | `heat_seat_l_0..3`, `heat_seat_r_0..3`, `vent_seat_l_0..3`, `vent_seat_r_0..3` | Подогрев и вентиляция водительского и пассажирского передних сидений. |
 | Обогревы | `heat_wheel_on`, `heat_wheel_off`, `heat_windshield_on`, `heat_windshield_off`, `heat_rearwindow_on`, `heat_rearwindow_off` | Руль, лобовое стекло и заднее стекло. |
 | Климат | `Driver_Temp_Down`, `Driver_Temp_Up`, `Passenger_Temp_Down`, `Passenger_Temp_Up` | Уменьшение и увеличение температуры водителя или пассажира на 1 от текущей. |
-| Задние сиденья | `heat_zad_seat_l_0..3`, `heat_zad_seat_r_off`, `heat_zad_seat_r_1..3` | Подогрев заднего левого и заднего правого сиденья. |
+| Задние сиденья | `heat_zad_seat_l_0..3`, `heat_zad_seat_r_off`, `heat_zad_seat_r_1..3`, `vent_zad_seat_l_0..3`, `vent_zad_seat_r_off`, `vent_zad_seat_r_1..3` | Подогрев и вентиляция заднего левого и заднего правого сиденья. |
 | Профили и прочее | `VIBOR_VODITEL`, `voditel_seat_1`, `voditel_seat_2`, `voditel_seat_3`, `VIEW_ALL_MESSAGE`, `b_fiksik_on`, `b_fiksik_off`, `RUN_APP_MORE`, `RUN_SPICH_FOCUS`, `Recirculation_On`, `Recirculation_Off` | Выбор водителя, сообщения, голосовой помощник, группа задач и рециркуляция. |
 
 ## Примеры
