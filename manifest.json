@@ -213,7 +213,7 @@
     {
       "name": "my_dashboard_AuroraHUD",
       "version": "1.0.0",
-      "author": "",
+      "author": "@artur4ano",
       "description": "AuroraHUD",
       "types": ["hud"],
       "preview": "https://raw.githubusercontent.com/JCarTools/AuroraHUD/master/AuroraHUD.png",
