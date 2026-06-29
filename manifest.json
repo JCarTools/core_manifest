@@ -209,6 +209,17 @@
       "zip": "https://github.com/JCarTools/alt_compact_glass/archive/refs/heads/master.zip",
       "updated_at": "2026-03-31T12:00:00Z",
       "active": true
+    },
+    {
+      "name": "my_dashboard_AuroraHUD",
+      "version": "1.0.0",
+      "author": "wohax",
+      "description": "AuroraHUD",
+      "types": ["hud"],
+      "preview": "https://raw.githubusercontent.com/JCarTools/AuroraHUD/master/AuroraHUD.png",
+      "zip": "https://github.com/JCarTools/AuroraHUD/archive/refs/heads/master.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
     }
   ]
 }
