@@ -212,13 +212,13 @@
     },
     {
       "name": "alt_compact_glass_map",
-      "version": "1.0.1",
+      "version": "1.0.0",
       "author": "wohax",
       "description": "Проекция компактное стекло с живой картой",
       "types": ["hud"],
       "preview": "https://raw.githubusercontent.com/JCarTools/alt_compact_glass_map/refs/heads/main/alt_compact_glass.png",
       "zip": "https://github.com/JCarTools/alt_compact_glass_map/archive/refs/heads/main.zip",
-      "updated_at": "2026-07-13T00:00:00Z",
+      "updated_at": "2026-07-12T17:30:00Z",
       "active": true
     },
     {
