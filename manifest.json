@@ -13,6 +13,17 @@
       "active": false
     },
     {
+      "name": "GeneralLauncher",
+      "version": "1.0.0",
+      "author": "woha",
+      "description": "GeneralLauncher",
+      "types": ["black"],
+      "preview": "https://raw.githubusercontent.com/JCarTools/GeneralLauncher/refs/heads/main/GeneralLauncher.jpg",
+      "zip": "https://github.com/JCarTools/GeneralLauncher/archive/refs/heads/master.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
+    },
+    {
       "name": "JQ-Home",
       "version": "1.0.0",
       "author": "mkkutuz",
