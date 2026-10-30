@@ -486,11 +486,109 @@ const result = JSON.parse(window.androidApi.carCommand(
 | Команды | Назначение |
 | --- | --- |
 | `open_trunk`, `close_trunk` | Открыть / закрыть багажник. |
-| `open_windows_full`, `open_windows_10`, `open_windows_50`, `close_windows` | Все окна: полное открытие, 10%, 50% или закрытие. |
+| `open_sunroof`, `close_sunroof` | Открыть / закрыть стекло люка; штатная команда выбирается по конфигурации автомобиля. Это отдельное управление от шторки. |
+| `open_windows_full`, `close_windows` | Полностью открыть / закрыть все окна. |
+| `open_windows_10` | Приоткрыть все окна штатным режимом проветривания. Имя сохранено для совместимости; точные 10% не задаются. |
 | `open_window_front_left_full`, `open_window_front_right_full`, `open_window_rear_left_full`, `open_window_rear_right_full` | Полностью открыть выбранное окно. |
-| `open_window_front_left_10`, `open_window_front_right_10`, `open_window_rear_left_10`, `open_window_rear_right_10` | Открыть выбранное окно на 10%. |
+| `close_window_front_left`, `close_window_front_right`, `close_window_rear_left`, `close_window_rear_right` | Закрыть выбранное окно. |
+| `open_window_front_left_10`, `open_window_front_right_10`, `open_window_rear_left_10`, `open_window_rear_right_10` | Попытка приоткрыть выбранное окно на один шаг от текущего положения. Требует доступной обратной связи; по проверке пользователя отдельные окна не реагируют, причина пока не устранена. |
 | `parking_sensors_on` | Включить парковочные датчики. |
 | `disable_qnx_vignette`, `enable_qnx_vignette` | Отключить / включить штатную навигационную виньетку приборной панели. |
+
+`open_windows_50` убрана из кастомных действий профиля J. Сохранившийся JSON-маршрут для неё возвращает `success: false`: произвольное процентное положение этим профилем не поддерживается. Приоткрытие отдельных окон не следует считать точным заданием 10%; исходные имена команд сохранены для совместимости.
+
+Для люка используются штатные команды стекла, а не ID шторки. Если конфигурацию люка прочитать не удалось либо конфигурация не поддерживается, команда возвращает `success: false`; причина записывается в журнал с меткой `JSunroof`.
+
+#### Состояние люка, окон и багажника
+
+Запросы проходят через тот же `CarCmdProxy.c(...)` и общий `CarJsonAdapter`. Они подключены к J-прокси, включая Urban и YAN; это не новые имена для `getCarData(token, name)`.
+
+| Команда | Параметры и результат |
+| --- | --- |
+| `get_body_state` | Общий снимок: объекты `sunroof`, `trunk` и массив `windows`. |
+| `get_sunroof_state` | Состояние и положение стекла люка. |
+| `get_windows_state` | `available` и массив `windows` из четырёх элементов. |
+| `get_window_state` | Обязательный `window`: целое `0..3`; состояние выбранного окна. |
+| `get_trunk_state` | Состояние багажника; текущий процент открытия недоступен. |
+
+Индексы `window`: `0` — переднее левое, `1` — переднее правое, `2` — заднее левое, `3` — заднее правое. У элементов массива `windows` дополнительно есть `window` и `name`: `front_left`, `front_right`, `rear_left`, `rear_right`. Отдельный ответ `get_window_state` не добавляет эти два поля.
+
+Каждый объект состояния содержит:
+
+| Поле | Значение |
+| --- | --- |
+| `available` | Прочитано хотя бы одно исходное значение состояния или положения. Не гарантирует наличие процента или распознанного состояния. |
+| `state` | `closed`, `open`, `partial`, `tilted` или `unknown`; набор зависит от механизма и конфигурации. |
+| `rawState` | Исходный код состояния из прошивки либо `null`. |
+| `rawPosition` | Исходное положение из прошивки либо `null`; шкала зависит от механизма. |
+| `openPercent` | Положение `0..100`, если его удалось определить, иначе `null`. |
+
+Недоступные поля сохраняются как JSON `null`, а не ноль. Запрос состояния может вернуть `success: true` вместе с `available: false`: маршрут выполнен, но данных нет. Для общего снимка проверяйте `available` у каждого вложенного объекта; у `get_body_state` нет общего поля `available`. У `get_windows_state` оно означает наличие данных хотя бы по одному окну.
+
+Для люка процент определяется только при поддерживаемой конфигурации положения; наклон `tilted` не переводится в процент. У багажника `rawPosition` и `openPercent` равны `null`: настройка максимальной высоты открытия не является текущим положением. Коды `rawState` разных механизмов нельзя интерпретировать по одной общей шкале.
+
+```js
+const windowState = JSON.parse(window.androidApi.carCommand(
+  TOKEN, JSON.stringify({ cmd: "get_window_state", window: 0 })
+));
+if (windowState.success && windowState.available) {
+  console.log(windowState.state);
+  if (windowState.openPercent !== null) {
+    console.log(windowState.openPercent);
+  }
+}
+
+const bodyState = JSON.parse(window.androidApi.carCommand(
+  TOKEN, JSON.stringify({ cmd: "get_body_state" })
+));
+```
+
+Условный ответ `get_trunk_state`:
+
+```json
+{
+  "command": "get_trunk_state",
+  "success": true,
+  "available": true,
+  "state": "open",
+  "rawState": 1,
+  "rawPosition": null,
+  "openPercent": null
+}
+```
+
+Также принимаются имена `getBodyState`, `getSunroofState`, `getWindowsState`, `getWindowState`, `getTrunkState`.
+
+#### TPMS в профиле J
+
+`get_tpms` подключена через общий адаптер к `ProInfoJ`, Urban и YAN. Сейчас доступны только флаги предупреждений по колёсам: давление и температура числом ещё не подключены.
+
+```js
+const tpms = JSON.parse(window.androidApi.carCommand(
+  TOKEN, JSON.stringify({ cmd: "get_tpms" })
+));
+```
+
+Условный ответ:
+
+```json
+{
+  "command": "get_tpms",
+  "success": true,
+  "flWarning": 0,
+  "frWarning": 1,
+  "rlWarning": 0,
+  "rrWarning": 0,
+  "pressureUnit": "bar",
+  "temperatureUnit": "C"
+}
+```
+
+Префиксы `fl`, `fr`, `rl`, `rr` — переднее левое, переднее правое, заднее левое и заднее правое колесо. `Warning: 0` означает отсутствие предупреждения, `1` — наличие предупреждения без уточнения причины. Это не значение давления.
+
+Поля `flPressure` / `frPressure` / `rlPressure` / `rrPressure` и аналогичные `…Temperature` сейчас отсутствуют. Поля единиц измерения добавляет общий адаптер; их наличие не означает наличие измерений. Если исходные TPMS-данные недоступны или недопустимы, ответ содержит `success: false`, `error: "Data unavailable"`. Не заменяйте отсутствие данных значением `Warning: 0`.
+
+Aliases: `getTpms`, `tpms`, `get_tires`, `getTires`.
 
 #### Дополнительные данные
 
@@ -501,6 +599,7 @@ const result = JSON.parse(window.androidApi.carCommand(
 | `get_turn_signals` | `left`, `right`: boolean; `leftValue`, `rightValue`: `0` / `1`; `leftValid`, `rightValid`. |
 | `get_left_turn_signal`, `get_right_turn_signal` | `value`: `0` / `1`; `active`: boolean; `side`: `left` / `right`. |
 | `get_high_beam` | `value`: `0` / `1`; `active`, `highBeam`: boolean. |
+| `get_tpms` | В J-профилях: `flWarning`, `frWarning`, `rlWarning`, `rrWarning`; числовые давление и температура пока отсутствуют. |
 
 Неизвестная команда возвращает `success: false` и `error: "Unknown command"`. Недоступные данные также могут приводить к `success: false`; не подменяйте их достоверным нулём или выключенным состоянием.
 
