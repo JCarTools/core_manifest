@@ -189,6 +189,17 @@
       "active": true
     },
     {
+      "name": "def_dash_1",
+      "version": "1.0.0",
+      "author": "wohax",
+      "description": "Колодцы обычные с картой",
+      "types": ["board"],
+      "preview": "https://raw.githubusercontent.com/JCarTools/def_dash_1/refs/heads/master/def_dash_1.png",
+      "zip": "https://github.com/JCarTools/def_dash_1/archive/refs/heads/master.zip",
+      "updated_at": "2026-03-31T12:00:00Z",
+      "active": true
+    },
+    {
       "name": "default_hud_txl",
       "version": "1.0.0",
       "author": "wohax",
