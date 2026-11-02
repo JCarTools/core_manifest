@@ -247,7 +247,7 @@
       "name": "alt_compact_glass",
       "version": "1.0.0",
       "author": "wohax",
-      "description": "Проекция компактное стекло",
+      "description": "Проекция компактное стекло Exlantix",
       "types": ["hud"],
       "preview": "https://raw.githubusercontent.com/JCarTools/alt_compact_glass/refs/heads/master/alt_compact_glass.png",
       "zip": "https://github.com/JCarTools/alt_compact_glass/archive/refs/heads/master.zip",
