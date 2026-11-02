@@ -208,7 +208,7 @@
       "preview": "https://raw.githubusercontent.com/JCarTools/default_hud_txl/refs/heads/master/hud_def.png",
       "zip": "https://github.com/JCarTools/default_hud_txl/archive/refs/heads/master.zip",
       "updated_at": "2026-03-31T12:00:00Z",
-      "active": true
+      "active": false
     },
     {
       "name": "default_hud",
@@ -260,7 +260,7 @@
       "author": "wohax",
       "description": "Проекция компактное стекло с живой картой",
       "types": ["hud"],
-      "preview": "https://raw.githubusercontent.com/JCarTools/alt_compact_glass_map/refs/heads/main/alt_compact_glass.png",
+      "preview": "https://raw.githubusercontent.com/JCarTools/alt_compact_glass_map/refs/heads/main/alt_compact_glass.png?v=afb43c2f1e49",
       "zip": "https://github.com/JCarTools/alt_compact_glass_map/archive/refs/heads/main.zip",
       "updated_at": "2026-07-12T17:30:00Z",
       "active": true
