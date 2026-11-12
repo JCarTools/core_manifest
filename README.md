@@ -45,6 +45,7 @@ window.androidApi.onJsReady(TOKEN);
 | `getAppInfo(token, packageName)` | JSON string | Получить название и иконку приложения. |
 | `setvol(token, value)` | `void` | Установить громкость. |
 | `getvol(token)` | number | Получить текущую media-громкость в процентах. |
+| `seekMusic(token, positionMs)` | boolean | Запросить перемотку текущего трека на позицию в миллисекундах. |
 | `getCarData(token, name)` | JSON string | Получить данные автомобиля по имени запроса. |
 | `carCommand(token, json)` | JSON string | Выполнить JSON-команду текущего `CarCmdProxy.c(...)`. |
 | `carCmd(token, json)` | JSON string | Короткий alias для `carCommand(...)`. |
@@ -100,9 +101,27 @@ const commandAccepted = window.androidApi.requestCarCommandAsync(
 
 ### Погода
 
-`getWeather(token)` возвращает сохранённую погоду: `city`, `temp`, `condition`, `icon` (URL иконки). При отсутствии данных возвращается `{}`. Температура передаётся строкой; не считайте её гарантированно числовым значением.
+`getWeather(token)` возвращает сохранённую погоду: `city`, `temp` (строка), `condition`, `icon` (числовой ID ресурса Android, не URL) и `forecast`. Вызов не ждёт загрузки: до первого обновления возможны `city: "N/A"`, `temp: ""` и `forecast: []`.
+
+`forecast` — массив до 10 дней, включая сегодня. У каждого дня есть текстовая подпись `label` и объект `parts` с периодами `morning`, `day`, `evening`, `night`. В каждом периоде `temp` и `feelsLike` — числа в °C, `condition` — описание. Если данных о периоде нет, ключ может отсутствовать. Если источник не вернул дневной прогноз, `forecast` будет пустым.
+
+```json
+{
+  "label": "Сегодня, 9 ноября",
+  "parts": {
+    "morning": { "temp": 4, "feelsLike": 0, "condition": "пасмурно" },
+    "day": { "temp": 5, "feelsLike": 0, "condition": "пасмурно" },
+    "evening": { "temp": 5, "feelsLike": 1, "condition": "пасмурно" },
+    "night": { "temp": 4, "feelsLike": 0, "condition": "облачно" }
+  }
+}
+```
+
+Выше показан один элемент массива. Один вызов возвращает текущую погоду и весь полученный прогноз, без отдельных запросов на каждый день.
 
 `refreshWeather(token, latitude, longitude)` запрашивает обновление по координатам. Ответ `{"status":"requested"}` означает приём запроса, а не готовую погоду. Результат приходит событием `weather` с указанными полями; при отсутствии результата — `{"error":"unavailable"}`. Если запрос не удалось начать из-за местоположения, метод возвращает `{"error":"location_unavailable"}`. Оба метода при неверном токене возвращают `unauthorized`.
+
+Включать плавающий виджет погоды для явного обновления не нужно. Сначала добавьте обработчик события `weather` в `window.onAndroidEvent`, затем вызовите `refreshWeather(token, latitude, longitude)`. Для мгновенного показа последних известных данных используйте `getWeather(token)`.
 
 ### Мини-карта
 
@@ -143,6 +162,13 @@ const volume = window.androidApi.getvol(TOKEN);
 ```
 
 ### `getCarData(token, name)`
+
+Запрос `storageFree` возвращает доступное место на том же накопителе, что и виджет места. `value` — байты, `display` — строка с тем же округлением, что у виджета (деление на 1024³).
+
+```js
+const storage = JSON.parse(androidApi.getCarData(token, "storageFree"));
+// { name: "storageFree", value: 12884901888, unit: "bytes", display: "12" }
+```
 
 Возвращает JSON-строку с данными автомобиля. Метод только читает данные из `CarCmdProxy`; управляющие команды через него не выполняются.
 
@@ -752,11 +778,11 @@ window.onAndroidEvent = function(type, data) {
 
 | Событие | Поля `data` | Назначение |
 | --- | --- | --- |
-| `musicInfo` | `PlayStat`, `SongName`, `SongArtist`, `SongAlbum`, `SongAlbumPicture`, `Trpos`, `Trdur` | Данные текущего трека. |
+| `musicInfo` | `PlayStat`, `SongName`, `SongArtist`, `SongAlbum`, `SongAlbumPicture`, `Trpos`, `Trdur`, `packageName` | Данные текущего трека и пакет активной медиасессии. |
 | `gps` | `lat`, `lon`, `speed`, `heading` | Координаты, GPS-скорость и курс. |
 | `speed` | `value` | Скорость автомобиля. |
 | `rpm` | `value` | Обороты двигателя. |
-| `weather` | `temp`, `icon`; при обновлении также `city`, `condition` либо `error` | Погода; состав полей зависит от источника события. |
+| `weather` | `temp`, `icon`; при явном обновлении также `city`, `condition`, `forecast` либо `error` | Погода; состав полей зависит от источника события. |
 | `carResponse` | `requestId`, `requestType`, `response` | Ответ асинхронного запроса данных, команды или запуска. |
 | `launcherCatalog` | `requestId`, `section`, `items`, `append`, `complete`, необязательное `error` | Часть каталога лаунчера. |
 | `miniMapFrame` | `image`, `timestamp` | Кадр мини-карты после подписки. |
@@ -904,6 +930,16 @@ if (!accepted) console.error("Request not accepted");
 ```
 
 ### Обновление плеера по событию
+
+`Trpos` и `Trdur` — позиция и длительность в миллисекундах. `packageName` — пакет активной медиасессии или пустая строка, если пакет неизвестен. В старых версиях поля может не быть. В веб-виджете отсутствующее `SongAlbumPicture` означает, что обложка не изменилась, а пустая строка — что её нужно очистить.
+
+Для перемотки передайте абсолютную позицию от начала трека:
+
+```js
+const sent = androidApi.seekMusic(token, 90_000); // На 1:30
+```
+
+`true` означает отправку команды, не подтверждение перемотки. Плеер должен поддерживать перемотку; при известной длительности позиция ограничивается концом трека. Фактическую позицию проверяйте по следующему `musicInfo`. При неверном токене, отрицательной позиции, отсутствии сессии или поддержки перемотки метод возвращает `false`.
 
 ```js
 window.onAndroidEvent = function(type, data) {
