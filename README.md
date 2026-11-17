@@ -46,6 +46,8 @@ window.androidApi.onJsReady(TOKEN);
 | `setvol(token, value)` | `void` | Установить громкость. |
 | `getvol(token)` | number | Получить текущую media-громкость в процентах. |
 | `seekMusic(token, positionMs)` | boolean | Запросить перемотку текущего трека на позицию в миллисекундах. |
+| `getMusicQueue(token)` | JSON string | Получить текущую очередь треков активного плеера. |
+| `selectMusicQueueItem(token, packageName, queueId)` | boolean | Запросить переключение на трек из текущей очереди. |
 | `getCarData(token, name)` | JSON string | Получить данные автомобиля по имени запроса. |
 | `carCommand(token, json)` | JSON string | Выполнить JSON-команду текущего `CarCmdProxy.c(...)`. |
 | `carCmd(token, json)` | JSON string | Короткий alias для `carCommand(...)`. |
@@ -838,11 +840,14 @@ window.androidApi.runEnum(TOKEN, "MEDIA_PLAY");
 | Навигация интерфейса | `GO_TO_PP`, `GO_TO_GU`, `TOGGLE_GU_PP`, `TOGGLE_GU_PP_CPP`, `GO_CPP_TO_PP`, `TOGGLE_CPP_PP` | Переключение между головным устройством, приборкой, картами и штатными экранами. |
 | Системные действия | `RUN_BLACK`, `OPEN_SHTORKA`, `CLOSE_SHTORKA`, `GLOBAL_BACK`, `GLOBAL_HOME`, `RUN_START_APP_MENU`, `RUN_FUN_CAR`, `SPLIT_RUN` | Чёрный экран, шторка, глобальные кнопки, меню приложений, быстрый доступ к функциям авто и разделение экрана. |
 | Медиа | `MEDIA_PLAY`, `MEDIA_PAUSE`, `MEDIA_NEXT`, `MEDIA_BLACK`, `Volume_Down`, `Volume_Up` | Плей, пауза, следующий и предыдущий трек, уменьшение и увеличение громкости на 1 процент от текущей. |
+| Переключатели | `MEDIA_PLAY_PAUSE`, `VPN_TOGGEL` | Переключить воспроизведение/паузу или VPN. |
 | Передние сиденья | `heat_seat_l_0..3`, `heat_seat_r_0..3`, `vent_seat_l_0..3`, `vent_seat_r_0..3` | Подогрев и вентиляция водительского и пассажирского передних сидений. |
 | Обогревы | `heat_wheel_on`, `heat_wheel_off`, `heat_windshield_on`, `heat_windshield_off`, `heat_rearwindow_on`, `heat_rearwindow_off` | Руль, лобовое стекло и заднее стекло. |
 | Климат | `Driver_Temp_Down`, `Driver_Temp_Up`, `Passenger_Temp_Down`, `Passenger_Temp_Up` | Уменьшение и увеличение температуры водителя или пассажира на 1 от текущей. |
 | Задние сиденья | `heat_zad_seat_l_0..3`, `heat_zad_seat_r_off`, `heat_zad_seat_r_1..3`, `vent_zad_seat_l_0..3`, `vent_zad_seat_r_off`, `vent_zad_seat_r_1..3` | Подогрев и вентиляция заднего левого и заднего правого сиденья. |
 | Профили и прочее | `VIBOR_VODITEL`, `voditel_seat_1`, `voditel_seat_2`, `voditel_seat_3`, `VIEW_ALL_MESSAGE`, `b_fiksik_on`, `b_fiksik_off`, `RUN_APP_MORE`, `RUN_SPICH_FOCUS`, `Recirculation_On`, `Recirculation_Off` | Выбор водителя, сообщения, голосовой помощник, группа задач и рециркуляция. |
+
+Актуальный список доступных действий можно получить через `getRunEnum(token)`.
 
 ## Примеры
 
@@ -953,6 +958,36 @@ window.onAndroidEvent = function(type, data) {
   }
 };
 ```
+
+### Очередь треков
+
+`getMusicQueue(token)` возвращает JSON-строку с текущей очередью, которую публикует активный плеер. Это не список сохранённых плейлистов. Пример ответа:
+
+```json
+{
+  "available": true,
+  "canSelect": true,
+  "packageName": "ru.yandex.music",
+  "activeQueueId": "102",
+  "items": [
+    { "queueId": "101", "title": "Первый трек", "subtitle": "Исполнитель A" },
+    { "queueId": "102", "title": "Второй трек", "subtitle": "Исполнитель B" }
+  ]
+}
+```
+
+Если плеер не публикует очередь или активной сессии нет, ответ содержит `available: false`, `canSelect: false` и `items: []`. Если очередь доступна, но активный трек неизвестен, `activeQueueId` равен `null`. `canSelect` показывает, поддерживает ли плеер выбор трека в непустой очереди. Идентификаторы треков передаются строками, чтобы JavaScript не терял точность.
+
+```js
+const queue = JSON.parse(window.androidApi.getMusicQueue(token));
+if (queue.canSelect && queue.items.length > 0) {
+  const sent = window.androidApi.selectMusicQueueItem(
+    token, queue.packageName, queue.items[0].queueId
+  );
+}
+```
+
+`true` означает, что команда отправлена, а не что плеер подтвердил переключение. Фактическую смену трека можно отследить по событию `musicInfo` или повторным чтением очереди.
 
 ## Приборная панель / HUD
 
